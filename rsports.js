@@ -75,13 +75,15 @@ const portsResources = async () => {
 
             newRow.children[0].dataset.value = resources[resource][itemid].qty;
             newRow.children[0].innerHTML = resources[resource][itemid].qty;
+
             newRow.children[1].dataset.name = resource;
             newRow.children[1].innerHTML = '<img src="./images/' + resource + '.png"> ' + resource;
-            newRow.children[2].dataset.name = item.name;
 
             let wikiLink = '<a href="https://runescape.wiki/w/' + item.name.replace(/\s+/g, '_') + '" target="_blank" rel=\"noreferrer noopener\">';
+            newRow.children[2].dataset.name = item.name;
             newRow.children[2].innerHTML = wikiLink + '<img src="/rsdata/images/' + itemid + '.gif">' + item.name + '</a>';
 
+            //Calc other costs to craft the item
             let othercosts = 0;
             for (other of others) {
                 let wikiLink = '<a href="https://runescape.wiki/w/' + other.name.replace(/\s+/g, '_') + '" target="_blank" rel=\"noreferrer noopener\">';
@@ -93,7 +95,6 @@ const portsResources = async () => {
                 newRow.children[3].innerHTML += othercosts.toLocaleString() + '<span class="coin">●</span>';
             }
 
-
             // check ely data
             let itemprice = item.price;
             if (rselydata[itemid] && rselydata[itemid].elyprices.length > 0) {
@@ -103,9 +104,9 @@ const portsResources = async () => {
                 }
                 itemprice = totalprice / rselydata[itemid].elyprices.length;
             }
-
             newRow.children[4].dataset.value = itemprice;
             newRow.children[4].innerHTML = itemprice.toLocaleString();
+
             newRow.children[5].dataset.value = (itemprice - othercosts) / resources[resource][itemid].qty;
             newRow.children[5].innerHTML = Math.floor((itemprice - othercosts) / resources[resource][itemid].qty).toLocaleString();
 
