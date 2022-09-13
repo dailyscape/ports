@@ -20,13 +20,17 @@ th {
     text-align: right;
 }
 
-th.alignleft {
-    text-align: left;
-}
-
 td[data-value] {
     text-align: right;
 }
+
+
+th.alignleft,
+td.alignleft,
+td[data-value].alignleft {
+    text-align: left;
+}
+
 
 nav {
     height: 56px;
