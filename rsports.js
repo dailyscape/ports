@@ -59,44 +59,55 @@ const portsResources = async () => {
     const tbody = table.querySelector('tbody');
 
     for (let resource in resources) {
-        for (let productid in resources[resource]) {
+        for (let itemid in resources[resource]) {
             let rowClone = sampleRow.content.cloneNode(true);
             let newRow = rowClone.querySelector('tr');
 
-            item = await getItem(productid);
+            item = await getItem(itemid);
 
             let others = [];
-            if (resources[resource][productid].other) {
-                for (let otherid in resources[resource][productid].other) {
+            if (resources[resource][itemid].other) {
+                for (let otherid in resources[resource][itemid].other) {
                     otheritem = await getItem(otherid);
                     others.push(otheritem);
                 }
             }
 
-            newRow.children[0].dataset.value = resources[resource][productid].qty;
-            newRow.children[0].innerHTML = resources[resource][productid].qty;
+            newRow.children[0].dataset.value = resources[resource][itemid].qty;
+            newRow.children[0].innerHTML = resources[resource][itemid].qty;
             newRow.children[1].dataset.name = resource;
             newRow.children[1].innerHTML = '<img src="./images/' + resource + '.png"> ' + resource;
             newRow.children[2].dataset.name = item.name;
 
             let wikiLink = '<a href="https://runescape.wiki/w/' + item.name.replace(/\s+/g, '_') + '" target="_blank" rel=\"noreferrer noopener\">';
-            newRow.children[2].innerHTML = wikiLink + '<img src="/rsdata/images/' + productid + '.gif">' + item.name + '</a>';
+            newRow.children[2].innerHTML = wikiLink + '<img src="/rsdata/images/' + itemid + '.gif">' + item.name + '</a>';
 
             let othercosts = 0;
             for (other of others) {
                 let wikiLink = '<a href="https://runescape.wiki/w/' + other.name.replace(/\s+/g, '_') + '" target="_blank" rel=\"noreferrer noopener\">';
-                newRow.children[3].innerHTML += wikiLink + '<img src="/rsdata/images/' + other.id + '.gif">' + other.name + '</a> x' + resources[resource][productid].other[other.id] + '<br>';
-                othercosts += other.price * resources[resource][productid].other[other.id];
+                newRow.children[3].innerHTML += wikiLink + '<img src="/rsdata/images/' + other.id + '.gif">' + other.name + '</a> x' + resources[resource][itemid].other[other.id] + '<br>';
+                othercosts += other.price * resources[resource][itemid].other[other.id];
             }
             newRow.children[3].dataset.value = othercosts;
             if (othercosts > 0) {
                 newRow.children[3].innerHTML += othercosts.toLocaleString() + '<span class="coin">●</span>';
             }
 
-            newRow.children[4].dataset.value = item.price;
-            newRow.children[4].innerHTML = item.price.toLocaleString();
-            newRow.children[5].dataset.value = (item.price - othercosts) / resources[resource][productid].qty;
-            newRow.children[5].innerHTML = Math.floor((item.price - othercosts) / resources[resource][productid].qty).toLocaleString();
+
+            // check ely data
+            let itemprice = item.price;
+            if (rselydata[itemid] && rselydata[itemid].elyprices.length > 0) {
+                let totalprice=0
+                for (let price of rselydata[itemid].elyprices) {
+                    totalprice+=price.price
+                }
+                itemprice = totalprice / rselydata[itemid].elyprices.length;
+            }
+
+            newRow.children[4].dataset.value = itemprice;
+            newRow.children[4].innerHTML = itemprice.toLocaleString();
+            newRow.children[5].dataset.value = (itemprice - othercosts) / resources[resource][itemid].qty;
+            newRow.children[5].innerHTML = Math.floor((itemprice - othercosts) / resources[resource][itemid].qty).toLocaleString();
 
             tbody.appendChild(newRow);
         }
